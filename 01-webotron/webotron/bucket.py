@@ -16,7 +16,6 @@ import util
 class BucketManager:
     """Manage an S3 Bucket."""
 
-
     CHUNK_SIZE = 8388608
 
     def __init__(self, session):
@@ -28,6 +27,10 @@ class BucketManager:
             multipart_threshold=self.CHUNK_SIZE
         )
         self.manifest = {}
+
+    def get_bucket(self, bucket_name):
+        """Get a bucket by name."""
+        return self.s3.Bucket(bucket_name)
 
     def get_region_name(self, bucket):
         """Get the bucket's region name."""
@@ -103,14 +106,12 @@ class BucketManager:
             }
         })
 
-
     def load_manifest(self, bucket):
         """Load manifest for caching purposes."""
         paginator = self.s3.meta.client.get_paginator('list_objects_v2')
         for page in paginator.paginate(Bucket=bucket.name):
             for obj in page.get('Contents', []):
                 self.manifest[obj['Key']] = obj['ETag']
-
 
     @staticmethod
     def hash_data(data):
@@ -119,7 +120,6 @@ class BucketManager:
         hash.update(data)
 
         return hash
-
 
     def gen_etag(self, path):
         """Generate etage for file."""
@@ -131,7 +131,7 @@ class BucketManager:
 
                 if not data:
                     break
-                
+
                 hashes.append(self.hash_data(data))
 
         if not hashes:
@@ -139,9 +139,9 @@ class BucketManager:
         elif len(hashes) == 1:
             return '"{}"'.format(hashes[0].hexdigest())
         else:
-            hash = self.hash_data(reduce(lambda x, y: x + y, (h.digest() for h in hashes)))
+            digests = (h.digest() for h in hashes)
+            hash = self.hash_data(reduce(lambda x, y: x + y, digests))
             return '"{}-{}"'.format(hash.hexdigest(), len(hashes))
-
 
     def upload_file(self, bucket, path, key):
         """Upload path to bucket at key."""
@@ -149,7 +149,7 @@ class BucketManager:
 
         etag = self.gen_etag(path)
         if self.manifest.get(key, '') == etag:
-            return 
+            return
 
         return bucket.upload_file(
             path,
