@@ -17,7 +17,7 @@ class DistributionManager:
         """Find a dist matching domain_name."""
         paginator = self.client.get_paginator('list_distributions')
         for page in paginator.paginate():
-            for dist in page['DistributionList'].get('items', []):
+            for dist in page['DistributionList'].get('Items', []):
                 for alias in dist['Aliases']['Items']:
                     if alias == domain_name:
                         return dist

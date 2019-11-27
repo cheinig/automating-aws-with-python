@@ -29,6 +29,7 @@ domain_manager = None
 cert_manager = None
 dist_manager = None
 
+
 @click.group()
 @click.option('--profile', default=None, help="Use a given AWS profile.")
 def cli(profile):
@@ -107,7 +108,7 @@ def find_cert(domain):
 def setup_cdn(domain, bucket):
     """Set up CloudFront CDN for DOMAIN pointing to BUCKET."""
     dist = dist_manager.find_matching_dist(domain)
-
+    print(dist)
     if not dist:
         cert = cert_manager.find_matching_cert(domain)
         if not cert:
