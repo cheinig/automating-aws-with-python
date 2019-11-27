@@ -13,7 +13,7 @@ class CertificateManager:
 
     def cert_matches(self, cert_arn, domain_name):
         """Return true if cert matches domain_name."""
-        cert_details = self.session.client.describe_certificate(
+        cert_details = self.client.describe_certificate(
             CertificateArn=cert_arn
         )
         alt_names = cert_details['Certificate']['SubjectAlternativeNames']

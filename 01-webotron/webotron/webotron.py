@@ -25,7 +25,9 @@ import util
 
 session = None
 bucket_manager = None
-
+domain_manager = None
+cert_manager = None
+dist_manager = None
 
 @click.group()
 @click.option('--profile', default=None, help="Use a given AWS profile.")

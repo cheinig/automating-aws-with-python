@@ -16,10 +16,11 @@ class DistributionManager:
     def find_matching_dist(self, domain_name):
         """Find a dist matching domain_name."""
         paginator = self.client.get_paginator('list_distributions')
-        for dist in paginator.paginate():
-            for alias in dist['Aliases']['Items']:
-                if alias == domain_name:
-                    return dist
+        for page in paginator.paginate():
+            for dist in page['DistributionList'].get('items', []):
+                for alias in dist['Aliases']['Items']:
+                    if alias == domain_name:
+                        return dist
 
         return None
 
@@ -44,7 +45,7 @@ class DistributionManager:
                         'DomainName':
                         '{}.s3.amazonaws.com'.format(domain_name),
                         'S3OriginConfig': {
-                            'OrigiinAccessIdentiy': ''
+                            'OriginAccessIdentity': ''
                         }
                     }]
                 },
