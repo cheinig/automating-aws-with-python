@@ -22,7 +22,7 @@ service: notifon-notifier
 
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.7
   profile: ${file(../config.${self:provider.stage}.json):notifier.profile}
   environment:
     SLACK_WEBHOOK_URL: ${file(../config.${self:provider.stage}.json):notifier.slack_webhook_url}
@@ -116,3 +116,6 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+plugins:
+  - serverless-python-requirements
